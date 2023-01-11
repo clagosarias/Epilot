@@ -1,6 +1,6 @@
 import { graphqlWithAuth, GET_USER_REPOS } from "../state/queries/queries";
 import { useNavigate, useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Spinner } from "../components/spinner/Spinner";
 import { Button, GoBack, NotFound, RepositoriesList, RepositoriesListBody, RepositoriesListHeader, RepositoriesPagination, RepositoryItem, UserContainer, UserProfile, UserProfileImg } from "../styles/UserStyles";
 import { FlexContainer } from "../components/flexContainer/FlexContainer";
@@ -46,7 +46,7 @@ const UserPage = () => {
     }
   }
 
-  const getUserRepos = async (pagination: Pagination) => {
+  const getUserRepos = useCallback(async (pagination: Pagination) => {
     try {
       const response: Response = await graphqlWithAuth(GET_USER_REPOS, {
         login: params.user,
@@ -59,11 +59,11 @@ const UserPage = () => {
     catch (error) {
       setLoading(false);
     }
-  }
+  }, [params.user]);
 
   useEffect(() => {
-    getFirstPage();
-  }, []);
+    getUserRepos({ first: PER_PAGE });
+  }, [getUserRepos]);
 
 
   return (
